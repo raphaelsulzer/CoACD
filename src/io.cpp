@@ -1,5 +1,8 @@
 #include "io.h"
 #include "logger.h"
+#include <random>
+
+using namespace std;
 
 namespace coacd
 {
@@ -21,17 +24,86 @@ namespace coacd
         logger::info("\tRandom Seed:                     {}", params.seed);
     }
 
-    void SaveOBJ(const string &filename, vector<Model> parts, Params &params)
+
+    void SavePLY(const string &filename, vector<Model> parts)
     {
+
+        default_random_engine generator;
+        uniform_int_distribution<int> color(0,255);
+        int red, green, blue;
+
+
+        vector<int> v_numbers;
+        v_numbers.push_back(0);
+        int n_facets = 0;
+        std::ofstream os(filename);
+
+        stringstream points;
+        stringstream facets;
+
+        for (int n = 0; n < (int)parts.size(); n++)
+        {
+            red = color(generator), green = color(generator), blue = color(generator);
+
+            for (int i = 0; i < (int)parts[n].points.size(); ++i)
+            {
+                points << parts[n].points[i][0] << " " << parts[n].points[i][1] << " " << parts[n].points[i][2] <<
+                      " " << red << " " << green << " " << blue << "\n";
+            }
+            v_numbers.push_back(v_numbers[n] + (int)parts[n].points.size());
+            for (int i = 0; i < (int)parts[n].triangles.size(); ++i)
+            {
+                n_facets++;
+                facets << "3 " <<  parts[n].triangles[i][0] + v_numbers[n]
+                   << " " << parts[n].triangles[i][1] + v_numbers[n]
+                   << " " << parts[n].triangles[i][2] + v_numbers[n] << "\n";
+            }
+        }
+
+        os
+          << "ply" << std::endl
+            << "format ascii 1.0" << std::endl
+            << "comment : ncells :" << parts.size() << std::endl
+            << "element vertex " << v_numbers.back() << std::endl
+            << "property float x" << std::endl
+            << "property float y" << std::endl
+            << "property float z" << std::endl
+            << "property uchar red" << std::endl
+            << "property uchar green" << std::endl
+            << "property uchar blue" << std::endl
+            << "element face " << n_facets << std::endl
+            << "property list uchar int vertex_indices" << std::endl
+            << "end_header" << std::endl;
+
+        os << points.rdbuf();
+        os << facets.rdbuf();
+
+
+
+        os.close();
+    }
+
+
+    void SaveOBJ(const string &filename, vector<Model> parts)
+    {
+
+        default_random_engine generator;
+        uniform_int_distribution<int> color(0,255);
+        int red, green, blue;
+
+
         vector<int> v_numbers;
         v_numbers.push_back(0);
         std::ofstream os(filename);
         for (int n = 0; n < (int)parts.size(); n++)
         {
+            red = color(generator), green = color(generator), blue = color(generator);
+
             os << "o convex_" << n << endl;
             for (int i = 0; i < (int)parts[n].points.size(); ++i)
             {
-                os << "v " << parts[n].points[i][0] << " " << parts[n].points[i][1] << " " << parts[n].points[i][2] << "\n";
+                os << "v " << parts[n].points[i][0] << " " << parts[n].points[i][1] << " " << parts[n].points[i][2] <<
+                      " " << red << " " << green << " " << blue << "\n";
             }
             v_numbers.push_back(v_numbers[n] + (int)parts[n].points.size());
             for (int i = 0; i < (int)parts[n].triangles.size(); ++i)
@@ -44,7 +116,7 @@ namespace coacd
         os.close();
     }
 
-    void SaveOBJs(const string &foldername, const string &filename, vector<Model> parts, Params &params)
+    void SaveOBJs(const string &foldername, const string &filename, vector<Model> parts)
     {
         int n_zero = 3;
         for (int n = 0; n < (int)parts.size(); n++)
@@ -144,7 +216,7 @@ namespace coacd
         }
     }
 
-    void SaveVRML(const string &fileName, vector<Model>& meshes, Params &params)
+    void SaveVRML(const string &fileName, vector<Model>& meshes)
     {
         ofstream foutCH(fileName);
         if (foutCH.is_open())

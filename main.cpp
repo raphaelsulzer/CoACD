@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
     logger::critical("Output Filename Error! You can set the output filename as either .OBJ or .WRL!");
     exit(0);
   }
-  if (ext != ".obj" && ext != ".wrl")
+  if (ext != ".obj" && ext != ".wrl" && ext != ".ply")
   {
-    logger::critical("Output Filename must be .OBJ or .WRL format!");
+    logger::critical("Output Filename must be .OBJ, .PLY or .WRL format!");
     exit(0);
   }
 
@@ -137,8 +137,17 @@ int main(int argc, char *argv[])
   string objName = regex_replace(params.output_name, regex("wrl"), "obj");
   string wrlName = regex_replace(params.output_name, regex("obj"), "wrl");
 
-  SaveVRML(wrlName, parts, params);
-  SaveOBJ(objName, parts, params);
+  SaveVRML(wrlName, parts);
+  if(ext == ".obj")
+      SaveOBJ(objName, parts);
+  else if(ext == ".ply")
+      SavePLY(objName, parts);
+  else
+  {
+    logger::critical("Output Filename must be .OBJ, .PLY or .WRL format!");
+    exit(0);
+  }
+
 
   return 0;
 }
