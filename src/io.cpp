@@ -63,7 +63,7 @@ namespace coacd
         os
           << "ply" << std::endl
             << "format ascii 1.0" << std::endl
-            << "comment : ncells :" << parts.size() << std::endl
+            << "comment : in_cells :" << parts.size() << std::endl
             << "element vertex " << v_numbers.back() << std::endl
             << "property float x" << std::endl
             << "property float y" << std::endl
