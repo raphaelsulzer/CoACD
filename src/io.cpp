@@ -29,7 +29,7 @@ namespace coacd
     {
 
         default_random_engine generator;
-        uniform_int_distribution<int> color(0,255);
+        uniform_int_distribution<int> color(100,255);
         int red, green, blue;
 
 
@@ -88,7 +88,7 @@ namespace coacd
     {
 
         default_random_engine generator;
-        uniform_int_distribution<int> color(0,255);
+        uniform_int_distribution<int> color(100,255);
         int red, green, blue;
 
 
